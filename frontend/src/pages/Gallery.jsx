@@ -131,7 +131,7 @@ export const Gallery = () => {
                       className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300 pointer-events-none" />
                   </div>
                 </motion.div>
               ))}
@@ -156,7 +156,7 @@ export const Gallery = () => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300 pointer-events-none" />
                   </div>
                 </motion.div>
               ))}
