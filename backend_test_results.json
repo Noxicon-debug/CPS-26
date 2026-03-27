@@ -1,0 +1,88 @@
+{
+  "summary": {
+    "total_tests": 13,
+    "passed_tests": 13,
+    "success_rate": 100.0,
+    "timestamp": "2026-03-27T04:34:19.893115"
+  },
+  "test_results": [
+    {
+      "test_name": "API Root",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:18.845943"
+    },
+    {
+      "test_name": "Contact Form Submission",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.016447"
+    },
+    {
+      "test_name": "Contact Form Response Validation",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-03-27T04:34:19.017077"
+    },
+    {
+      "test_name": "Get Contacts",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.139809"
+    },
+    {
+      "test_name": "Contacts Response Format",
+      "success": true,
+      "details": "Returned 1 contacts",
+      "timestamp": "2026-03-27T04:34:19.140531"
+    },
+    {
+      "test_name": "Get Events",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.236643"
+    },
+    {
+      "test_name": "Events Response Format",
+      "success": true,
+      "details": "Returned 0 events",
+      "timestamp": "2026-03-27T04:34:19.237369"
+    },
+    {
+      "test_name": "Create Event",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.349778"
+    },
+    {
+      "test_name": "Get News",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.501334"
+    },
+    {
+      "test_name": "News Response Format",
+      "success": true,
+      "details": "Returned 0 news items",
+      "timestamp": "2026-03-27T04:34:19.501963"
+    },
+    {
+      "test_name": "Create News",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.608146"
+    },
+    {
+      "test_name": "Create Status Check",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.745870"
+    },
+    {
+      "test_name": "Get Status Checks",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-27T04:34:19.892425"
+    }
+  ]
+}
