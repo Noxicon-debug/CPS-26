@@ -7,20 +7,20 @@ import { Card } from '../components/ui/card';
 
 // Sample images from the Highlights folder
 const heroImages = [
-  '/images/Highlights/AG8A2573.jpg',
-  '/images/Highlights/AG8A2590.jpg',
-  '/images/Highlights/AG8A2604.jpg',
-  '/images/Highlights/AG8A2614.jpg',
-];
+'/images/Highlights/AG8A2573.jpg',
+'/images/Highlights/AG8A2590.jpg',
+'/images/Highlights/AG8A2604.jpg',
+'/images/Highlights/AG8A2614.jpg'];
+
 
 const galleryPreview = [
-  '/images/Highlights/AG8A2576.jpg',
-  '/images/Highlights/AG8A2591.jpg',
-  '/images/Highlights/AG8A2597.jpg',
-  '/images/Highlights/AG8A2610.jpg',
-  '/images/Highlights/AG8A2618.jpg',
-  '/images/Highlights/AG8A2626.jpg',
-];
+'/images/Highlights/AG8A2576.jpg',
+'/images/Highlights/AG8A2591.jpg',
+'/images/Highlights/AG8A2597.jpg',
+'/images/Highlights/AG8A2610.jpg',
+'/images/Highlights/AG8A2618.jpg',
+'/images/Highlights/AG8A2626.jpg'];
+
 
 export const Home = () => {
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
@@ -33,27 +33,27 @@ export const Home = () => {
   }, []);
 
   const features = [
-    {
-      icon: Users,
-      title: 'Community',
-      description: 'Connect with fellow Catholic professionals across Papua New Guinea.',
-    },
-    {
-      icon: Calendar,
-      title: 'Events',
-      description: 'Regular gatherings, retreats, and professional development sessions.',
-    },
-    {
-      icon: BookOpen,
-      title: 'Formation',
-      description: 'Grow in faith through spiritual formation and professional ethics.',
-    },
-    {
-      icon: Heart,
-      title: 'Service',
-      description: 'Give back to our communities through charitable works and outreach.',
-    },
-  ];
+  {
+    icon: Users,
+    title: 'Community',
+    description: 'Connect with fellow Catholic professionals across Papua New Guinea.'
+  },
+  {
+    icon: Calendar,
+    title: 'Events',
+    description: 'Regular gatherings, retreats, and professional development sessions.'
+  },
+  {
+    icon: BookOpen,
+    title: 'Formation',
+    description: 'Grow in faith through spiritual formation and professional ethics.'
+  },
+  {
+    icon: Heart,
+    title: 'Service',
+    description: 'Give back to our communities through charitable works and outreach.'
+  }];
+
 
   return (
     <div data-testid="home-page">
@@ -65,8 +65,8 @@ export const Home = () => {
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
+              transition={{ duration: 0.8 }}>
+
               <span className="text-xs uppercase tracking-[0.2em] font-bold text-[#C29B57]">
                 Faith & Excellence
               </span>
@@ -81,8 +81,8 @@ export const Home = () => {
                 <Button
                   asChild
                   data-testid="hero-cta-primary"
-                  className="bg-[#1C2522] text-[#F8F5F0] hover:bg-[#2D3B36] px-8 py-6 rounded-sm text-base font-medium"
-                >
+                  className="bg-[#1C2522] text-[#F8F5F0] hover:bg-[#2D3B36] px-8 py-6 rounded-sm text-base font-medium">
+
                   <Link to="/contact">
                     Join Our Community
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -92,8 +92,8 @@ export const Home = () => {
                   asChild
                   variant="outline"
                   data-testid="hero-cta-secondary"
-                  className="border-[#1C2522]/20 text-[#1C2522] hover:bg-[#EAE5DC] px-8 py-6 rounded-sm text-base font-medium"
-                >
+                  className="border-[#1C2522]/20 text-[#1C2522] hover:bg-[#EAE5DC] px-8 py-6 rounded-sm text-base font-medium">
+
                   <Link to="/about">Learn More</Link>
                 </Button>
               </div>
@@ -104,29 +104,29 @@ export const Home = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="grid grid-cols-2 gap-4"
-            >
-              {heroImages.map((img, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 + idx * 0.1 }}
-                  className={`relative overflow-hidden rounded-sm ${
-                    idx === 0 ? 'row-span-2' : ''
-                  }`}
-                >
+              className="grid grid-cols-2 gap-4">
+
+              {heroImages.map((img, idx) =>
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 + idx * 0.1 }}
+                className={`relative overflow-hidden rounded-sm ${
+                idx === 0 ? 'row-span-2' : ''}`
+                }>
+
                   <img
-                    src={img}
-                    alt={`Community highlight ${idx + 1}`}
-                    data-testid={`hero-image-${idx}`}
-                    className={`w-full object-cover ${
-                      idx === 0 ? 'h-full min-h-[400px]' : 'h-48 md:h-56'
-                    }`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C2522]/30 to-transparent" />
+                  src={img}
+                  alt={`Community highlight ${idx + 1}`}
+                  data-testid={`hero-image-${idx}`}
+                  className={`w-full object-cover ${
+                  idx === 0 ? 'h-full min-h-[400px]' : 'h-48 md:h-56'}`
+                  } />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C2522]/30 to-transparent !rounded-[50px]" />
                 </motion.div>
-              ))}
+              )}
             </motion.div>
           </div>
         </div>
@@ -152,8 +152,8 @@ export const Home = () => {
               <Button
                 asChild
                 data-testid="about-cta"
-                className="bg-[#7A2E35] text-[#F8F5F0] hover:bg-[#5a222a] mt-8 px-6 rounded-sm"
-              >
+                className="bg-[#7A2E35] text-[#F8F5F0] hover:bg-[#5a222a] mt-8 px-6 rounded-sm">
+
                 <Link to="/about">
                   Our Story
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -165,8 +165,8 @@ export const Home = () => {
                 src="/images/Highlights/AG8A2627.jpg"
                 alt="Community gathering"
                 data-testid="about-preview-image"
-                className="w-full h-[500px] object-cover rounded-sm"
-              />
+                className="w-full h-[500px] object-cover rounded-sm" />
+
               <div className="absolute -bottom-6 -left-6 bg-[#1C2522] text-[#F8F5F0] p-6 rounded-sm">
                 <div className="text-4xl font-['Cormorant_Garamond'] font-bold text-[#C29B57]">
                   100+
@@ -193,18 +193,18 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, idx) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
+            {features.map((feature, idx) =>
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              viewport={{ once: true }}>
+
                 <Card
-                  data-testid={`feature-card-${idx}`}
-                  className="bg-[#F8F5F0] border border-[#1C2522]/10 rounded-sm p-8 h-full hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
-                >
+                data-testid={`feature-card-${idx}`}
+                className="bg-[#F8F5F0] border border-[#1C2522]/10 rounded-sm p-8 h-full hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+
                   <div className="w-12 h-12 bg-[#C29B57]/10 rounded-sm flex items-center justify-center mb-6">
                     <feature.icon className="w-6 h-6 text-[#C29B57]" />
                   </div>
@@ -216,7 +216,7 @@ export const Home = () => {
                   </p>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -237,8 +237,8 @@ export const Home = () => {
               asChild
               variant="outline"
               data-testid="gallery-cta"
-              className="border-[#F8F5F0]/20 text-[#F8F5F0] hover:bg-[#F8F5F0]/10 rounded-sm"
-            >
+              className="border-[#F8F5F0]/20 text-[#F8F5F0] hover:bg-[#F8F5F0]/10 rounded-sm">
+
               <Link to="/gallery">
                 View All Photos
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -247,24 +247,24 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryPreview.map((img, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="relative group overflow-hidden rounded-sm"
-              >
+            {galleryPreview.map((img, idx) =>
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              viewport={{ once: true }}
+              className="relative group overflow-hidden rounded-sm">
+
                 <img
-                  src={img}
-                  alt={`Gallery preview ${idx + 1}`}
-                  data-testid={`gallery-preview-${idx}`}
-                  className="w-full h-48 md:h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                src={img}
+                alt={`Gallery preview ${idx + 1}`}
+                data-testid={`gallery-preview-${idx}`}
+                className="w-full h-48 md:h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+
                 <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/40 transition-colors duration-300" />
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -286,8 +286,8 @@ export const Home = () => {
               <Button
                 asChild
                 data-testid="bottom-cta"
-                className="bg-[#F8F5F0] text-[#7A2E35] hover:bg-[#EAE5DC] mt-8 px-8 py-6 rounded-sm text-base font-medium"
-              >
+                className="bg-[#F8F5F0] text-[#7A2E35] hover:bg-[#EAE5DC] mt-8 px-8 py-6 rounded-sm text-base font-medium">
+
                 <Link to="/contact">
                   Get Started Today
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -297,8 +297,8 @@ export const Home = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Home;
