@@ -1,88 +1,178 @@
 {
   "summary": {
-    "total_tests": 13,
-    "passed_tests": 13,
+    "total_tests": 28,
+    "passed_tests": 28,
     "success_rate": 100.0,
-    "timestamp": "2026-03-27T04:34:19.893115"
+    "timestamp": "2026-03-31T05:57:00.143578"
   },
   "test_results": [
     {
       "test_name": "API Root",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:18.845943"
+      "timestamp": "2026-03-31T05:56:57.395700"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-31T05:56:57.765323"
+    },
+    {
+      "test_name": "Registration Response Validation",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-03-31T05:56:57.765911"
+    },
+    {
+      "test_name": "Pre-Login Registration",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-31T05:56:58.172589"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-31T05:56:58.505254"
+    },
+    {
+      "test_name": "Login Response Validation",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-03-31T05:56:58.505882"
+    },
+    {
+      "test_name": "Auth Me (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:58.641367"
+    },
+    {
+      "test_name": "Dashboard Stats (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:58.776672"
     },
     {
       "test_name": "Contact Form Submission",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.016447"
+      "timestamp": "2026-03-31T05:56:58.922757"
     },
     {
       "test_name": "Contact Form Response Validation",
       "success": true,
       "details": "All required fields present",
-      "timestamp": "2026-03-27T04:34:19.017077"
+      "timestamp": "2026-03-31T05:56:58.923304"
     },
     {
-      "test_name": "Get Contacts",
+      "test_name": "Get Contacts (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:59.022861"
+    },
+    {
+      "test_name": "Get Events (Public)",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.139809"
-    },
-    {
-      "test_name": "Contacts Response Format",
-      "success": true,
-      "details": "Returned 1 contacts",
-      "timestamp": "2026-03-27T04:34:19.140531"
-    },
-    {
-      "test_name": "Get Events",
-      "success": true,
-      "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.236643"
+      "timestamp": "2026-03-31T05:56:59.125239"
     },
     {
       "test_name": "Events Response Format",
       "success": true,
-      "details": "Returned 0 events",
-      "timestamp": "2026-03-27T04:34:19.237369"
+      "details": "Returned 1 events",
+      "timestamp": "2026-03-31T05:56:59.125861"
     },
     {
-      "test_name": "Create Event",
+      "test_name": "Create Event (No Auth)",
       "success": true,
-      "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.349778"
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:59.225147"
     },
     {
-      "test_name": "Get News",
+      "test_name": "Get News (Public)",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.501334"
+      "timestamp": "2026-03-31T05:56:59.323883"
     },
     {
       "test_name": "News Response Format",
       "success": true,
       "details": "Returned 0 news items",
-      "timestamp": "2026-03-27T04:34:19.501963"
+      "timestamp": "2026-03-31T05:56:59.324330"
     },
     {
-      "test_name": "Create News",
+      "test_name": "Create News (No Auth)",
       "success": true,
-      "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.608146"
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:59.415761"
     },
     {
-      "test_name": "Create Status Check",
+      "test_name": "Get Members (Public)",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.745870"
+      "timestamp": "2026-03-31T05:56:59.513820"
     },
     {
-      "test_name": "Get Status Checks",
+      "test_name": "Members Response Format",
+      "success": true,
+      "details": "Returned 0 members",
+      "timestamp": "2026-03-31T05:56:59.514410"
+    },
+    {
+      "test_name": "Create Member (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:59.611335"
+    },
+    {
+      "test_name": "Newsletter Subscription",
       "success": true,
       "details": "Status: 200, Expected: 200",
-      "timestamp": "2026-03-27T04:34:19.892425"
+      "timestamp": "2026-03-31T05:56:59.717102"
+    },
+    {
+      "test_name": "Newsletter Response Validation",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-03-31T05:56:59.717612"
+    },
+    {
+      "test_name": "Get Newsletter Subscribers (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:56:59.826137"
+    },
+    {
+      "test_name": "Get Page Settings (Public)",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-31T05:56:59.928541"
+    },
+    {
+      "test_name": "Page Settings Response Format",
+      "success": true,
+      "details": "Settings endpoint accessible",
+      "timestamp": "2026-03-31T05:56:59.929154"
+    },
+    {
+      "test_name": "Update Page Settings (No Auth)",
+      "success": true,
+      "details": "Status: 401, Expected: 401",
+      "timestamp": "2026-03-31T05:57:00.037728"
+    },
+    {
+      "test_name": "Get Gallery Images",
+      "success": true,
+      "details": "Status: 200, Expected: 200",
+      "timestamp": "2026-03-31T05:57:00.142806"
+    },
+    {
+      "test_name": "Gallery Response Format",
+      "success": true,
+      "details": "DB images: 0, FS images: 234",
+      "timestamp": "2026-03-31T05:57:00.143532"
     }
   ]
 }

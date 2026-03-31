@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Cross } from 'lucide-react';
+import { Menu, X, Cross, User } from 'lucide-react';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,7 +85,29 @@ export const Navbar = () => {
           </div>
 
           {/* CTA Button */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:flex items-center gap-3">
+            {user ? (
+              <Button
+                asChild
+                data-testid="nav-admin-button"
+                variant="outline"
+                className="border-[#1C2522]/20 text-[#1C2522] hover:bg-[#EAE5DC] rounded-sm"
+              >
+                <Link to="/admin">
+                  <User className="w-4 h-4 mr-2" />
+                  Admin
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                asChild
+                data-testid="nav-login-button"
+                variant="ghost"
+                className="text-[#4A5D54] hover:text-[#1C2522]"
+              >
+                <Link to="/login">Login</Link>
+              </Button>
+            )}
             <Button
               asChild
               data-testid="nav-join-button"

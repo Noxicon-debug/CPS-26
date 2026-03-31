@@ -6,12 +6,14 @@ import json
 from datetime import datetime
 from typing import Dict, Any
 
-class CatholicProfessionalsAPITester:
+class CatholicProfessionalsCMSTester:
     def __init__(self, base_url="https://catholic-biz-png.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        self.session_token = None
+        self.test_user_id = None
 
     def log_test(self, name: str, success: bool, details: str = ""):
         """Log test result"""
@@ -32,16 +34,26 @@ class CatholicProfessionalsAPITester:
         if details:
             print(f"   Details: {details}")
 
-    def run_test(self, name: str, method: str, endpoint: str, expected_status: int, data: Dict[Any, Any] = None) -> tuple:
+    def run_test(self, name: str, method: str, endpoint: str, expected_status: int, data: Dict[Any, Any] = None, auth_required: bool = False) -> tuple:
         """Run a single API test"""
         url = f"{self.base_url}/api/{endpoint}"
         headers = {'Content-Type': 'application/json'}
+        
+        # Add auth header if required and available
+        if auth_required and self.session_token:
+            headers['Authorization'] = f'Bearer {self.session_token}'
 
         try:
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=10)
             elif method == 'POST':
                 response = requests.post(url, json=data, headers=headers, timeout=10)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=headers, timeout=10)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, timeout=10)
+            elif method == 'PATCH':
+                response = requests.patch(url, json=data, headers=headers, timeout=10)
             else:
                 self.log_test(name, False, f"Unsupported method: {method}")
                 return False, {}
@@ -73,11 +85,110 @@ class CatholicProfessionalsAPITester:
         )
         return success and "Catholic Professionals PNG API" in str(response)
 
-    def test_contact_form_submission(self):
-        """Test contact form submission"""
+    def test_auth_register(self):
+        """Test user registration"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         test_data = {
-            "name": "Test User",
-            "email": "test@example.com",
+            "name": f"Test User {timestamp}",
+            "email": f"test_{timestamp}@example.com",
+            "password": "TestPassword123!"
+        }
+        
+        success, response = self.run_test(
+            "User Registration",
+            "POST",
+            "auth/register",
+            200,
+            test_data
+        )
+        
+        if success and response:
+            self.test_user_id = response.get('user_id')
+            # Registration should set session cookie, but we'll test login separately
+            required_fields = ["user_id", "email", "name", "role"]
+            missing_fields = [field for field in required_fields if field not in response]
+            if missing_fields:
+                self.log_test("Registration Response Validation", False, f"Missing fields: {missing_fields}")
+                return False
+            else:
+                self.log_test("Registration Response Validation", True, "All required fields present")
+        
+        return success
+
+    def test_auth_login(self):
+        """Test user login"""
+        # First register a user
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        register_data = {
+            "name": f"Login Test User {timestamp}",
+            "email": f"login_test_{timestamp}@example.com",
+            "password": "TestPassword123!"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Pre-Login Registration",
+            "POST",
+            "auth/register",
+            200,
+            register_data
+        )
+        
+        if not reg_success:
+            return False
+        
+        # Now test login
+        login_data = {
+            "email": register_data["email"],
+            "password": register_data["password"]
+        }
+        
+        success, response = self.run_test(
+            "User Login",
+            "POST",
+            "auth/login",
+            200,
+            login_data
+        )
+        
+        if success and response:
+            self.test_user_id = response.get('user_id')
+            # Login doesn't return session token in response, it sets cookie
+            required_fields = ["user_id", "email", "name", "role"]
+            missing_fields = [field for field in required_fields if field not in response]
+            if missing_fields:
+                self.log_test("Login Response Validation", False, f"Missing fields: {missing_fields}")
+                return False
+            else:
+                self.log_test("Login Response Validation", True, "All required fields present")
+        
+        return success
+
+    def test_auth_me_without_auth(self):
+        """Test auth/me endpoint without authentication"""
+        success, response = self.run_test(
+            "Auth Me (No Auth)",
+            "GET",
+            "auth/me",
+            401
+        )
+        return success
+
+    def test_dashboard_stats_without_auth(self):
+        """Test dashboard stats endpoint without authentication"""
+        success, response = self.run_test(
+            "Dashboard Stats (No Auth)",
+            "GET",
+            "dashboard/stats",
+            401
+        )
+        return success
+
+    def test_contact_form_submission(self):
+        """Test contact form submission (public endpoint)"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        test_data = {
+            "name": f"Test User {timestamp}",
+            "email": f"test_{timestamp}@example.com",
             "phone": "+675 123 4567",
             "subject": "Test Subject",
             "message": "This is a test message from the automated test suite."
@@ -92,7 +203,6 @@ class CatholicProfessionalsAPITester:
         )
         
         if success and response:
-            # Verify response contains expected fields
             required_fields = ["id", "name", "email", "subject", "message", "created_at", "status"]
             missing_fields = [field for field in required_fields if field not in response]
             if missing_fields:
@@ -103,29 +213,21 @@ class CatholicProfessionalsAPITester:
         
         return success
 
-    def test_get_contacts(self):
-        """Test getting contacts"""
+    def test_get_contacts_without_auth(self):
+        """Test getting contacts without authentication"""
         success, response = self.run_test(
-            "Get Contacts",
+            "Get Contacts (No Auth)",
             "GET",
             "contact",
-            200
+            401
         )
-        
-        if success:
-            if isinstance(response, list):
-                self.log_test("Contacts Response Format", True, f"Returned {len(response)} contacts")
-            else:
-                self.log_test("Contacts Response Format", False, "Response is not a list")
-                return False
-        
         return success
 
     def test_events_endpoints(self):
-        """Test events endpoints"""
-        # Test GET events
+        """Test events endpoints (public access)"""
+        # Test GET events (public)
         success, response = self.run_test(
-            "Get Events",
+            "Get Events (Public)",
             "GET",
             "events",
             200
@@ -136,7 +238,7 @@ class CatholicProfessionalsAPITester:
         else:
             self.log_test("Events Response Format", False, "Invalid response format")
         
-        # Test POST event
+        # Test POST event without auth (should fail)
         test_event = {
             "title": "Test Event",
             "description": "This is a test event",
@@ -148,20 +250,20 @@ class CatholicProfessionalsAPITester:
         }
         
         post_success, post_response = self.run_test(
-            "Create Event",
+            "Create Event (No Auth)",
             "POST",
             "events",
-            200,
+            401,
             test_event
         )
         
         return success and post_success
 
     def test_news_endpoints(self):
-        """Test news endpoints"""
-        # Test GET news
+        """Test news endpoints (public access)"""
+        # Test GET news (public)
         success, response = self.run_test(
-            "Get News",
+            "Get News (Public)",
             "GET",
             "news",
             200
@@ -172,7 +274,7 @@ class CatholicProfessionalsAPITester:
         else:
             self.log_test("News Response Format", False, "Invalid response format")
         
-        # Test POST news
+        # Test POST news without auth (should fail)
         test_news = {
             "title": "Test News Article",
             "excerpt": "This is a test news excerpt",
@@ -185,43 +287,139 @@ class CatholicProfessionalsAPITester:
         }
         
         post_success, post_response = self.run_test(
-            "Create News",
+            "Create News (No Auth)",
             "POST",
             "news",
-            200,
+            401,
             test_news
         )
         
         return success and post_success
 
-    def test_status_endpoints(self):
-        """Test status check endpoints"""
-        # Test POST status
-        test_status = {
-            "client_name": "test_client"
+    def test_members_endpoints(self):
+        """Test members endpoints (public access)"""
+        # Test GET members (public)
+        success, response = self.run_test(
+            "Get Members (Public)",
+            "GET",
+            "members",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("Members Response Format", True, f"Returned {len(response)} members")
+        else:
+            self.log_test("Members Response Format", False, "Invalid response format")
+        
+        # Test POST member without auth (should fail)
+        test_member = {
+            "name": "Test Member",
+            "email": "member@example.com",
+            "profession": "Test Profession",
+            "company": "Test Company",
+            "bio": "Test bio",
+            "featured": False,
+            "published": True
+        }
+        
+        post_success, post_response = self.run_test(
+            "Create Member (No Auth)",
+            "POST",
+            "members",
+            401,
+            test_member
+        )
+        
+        return success and post_success
+
+    def test_newsletter_endpoints(self):
+        """Test newsletter endpoints"""
+        # Test newsletter subscription (public)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        test_data = {
+            "email": f"newsletter_{timestamp}@example.com",
+            "name": f"Newsletter Test {timestamp}"
         }
         
         success, response = self.run_test(
-            "Create Status Check",
+            "Newsletter Subscription",
             "POST",
-            "status",
+            "newsletter",
             200,
-            test_status
+            test_data
         )
         
-        # Test GET status
+        if success and response:
+            required_fields = ["id", "email", "subscribed", "created_at"]
+            missing_fields = [field for field in required_fields if field not in response]
+            if missing_fields:
+                self.log_test("Newsletter Response Validation", False, f"Missing fields: {missing_fields}")
+                return False
+            else:
+                self.log_test("Newsletter Response Validation", True, "All required fields present")
+        
+        # Test GET newsletter subscribers without auth (should fail)
         get_success, get_response = self.run_test(
-            "Get Status Checks",
+            "Get Newsletter Subscribers (No Auth)",
             "GET",
-            "status",
-            200
+            "newsletter",
+            401
         )
         
         return success and get_success
 
+    def test_page_settings_endpoints(self):
+        """Test page settings endpoints"""
+        # Test GET page settings (public)
+        success, response = self.run_test(
+            "Get Page Settings (Public)",
+            "GET",
+            "settings/hero",
+            200
+        )
+        
+        if success:
+            self.log_test("Page Settings Response Format", True, "Settings endpoint accessible")
+        
+        # Test PUT page settings without auth (should fail)
+        test_settings = {
+            "settings": {
+                "title": "Test Title",
+                "subtitle": "Test Subtitle"
+            }
+        }
+        
+        put_success, put_response = self.run_test(
+            "Update Page Settings (No Auth)",
+            "PUT",
+            "settings/hero",
+            401,
+            test_settings
+        )
+        
+        return success and put_success
+
+    def test_gallery_endpoints(self):
+        """Test gallery endpoints"""
+        # Test GET gallery (public)
+        success, response = self.run_test(
+            "Get Gallery Images",
+            "GET",
+            "gallery",
+            200
+        )
+        
+        if success and response:
+            if "db_images" in response and "fs_images" in response:
+                self.log_test("Gallery Response Format", True, f"DB images: {len(response.get('db_images', []))}, FS images: {len(response.get('fs_images', []))}")
+            else:
+                self.log_test("Gallery Response Format", False, "Missing db_images or fs_images")
+        
+        return success
+
     def run_all_tests(self):
         """Run all backend API tests"""
-        print("🚀 Starting Catholic Professionals PNG API Tests")
+        print("🚀 Starting Catholic Professionals PNG CMS API Tests")
         print(f"📍 Testing against: {self.base_url}")
         print("=" * 60)
         
@@ -230,12 +428,26 @@ class CatholicProfessionalsAPITester:
             print("❌ API root endpoint failed - stopping tests")
             return False
         
-        # Test all endpoints
+        # Test authentication endpoints
+        print("\n🔐 Testing Authentication Endpoints")
+        self.test_auth_register()
+        self.test_auth_login()
+        self.test_auth_me_without_auth()
+        
+        # Test dashboard endpoints
+        print("\n📊 Testing Dashboard Endpoints")
+        self.test_dashboard_stats_without_auth()
+        
+        # Test public endpoints
+        print("\n🌐 Testing Public Endpoints")
         self.test_contact_form_submission()
-        self.test_get_contacts()
+        self.test_get_contacts_without_auth()
         self.test_events_endpoints()
         self.test_news_endpoints()
-        self.test_status_endpoints()
+        self.test_members_endpoints()
+        self.test_newsletter_endpoints()
+        self.test_page_settings_endpoints()
+        self.test_gallery_endpoints()
         
         # Print summary
         print("=" * 60)
@@ -270,7 +482,7 @@ class CatholicProfessionalsAPITester:
             print(f"❌ Failed to save results: {e}")
 
 def main():
-    tester = CatholicProfessionalsAPITester()
+    tester = CatholicProfessionalsCMSTester()
     success = tester.run_all_tests()
     tester.save_results()
     
