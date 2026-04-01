@@ -1,33 +1,72 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Grid, LayoutGrid } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Grid, LayoutGrid, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import axios from 'axios';
 
-// Generate list of all images
-const generateImageList = () => {
-  const images = [];
-  const imageNames = [
-    'AG8A2573', 'AG8A2576-2', 'AG8A2576', 'AG8A2578', 'AG8A2579-2', 'AG8A2580', 'AG8A2581',
-    'AG8A2584', 'AG8A2586', 'AG8A2588', 'AG8A2590', 'AG8A2591', 'AG8A2592', 'AG8A2593',
-    'AG8A2595', 'AG8A2597', 'AG8A2598', 'AG8A2599', 'AG8A2601', 'AG8A2602', 'AG8A2604',
-    'AG8A2605', 'AG8A2607', 'AG8A2610', 'AG8A2614', 'AG8A2615', 'AG8A2616', 'AG8A2617',
-    'AG8A2618', 'AG8A2619', 'AG8A2620', 'AG8A2621', 'AG8A2622', 'AG8A2623', 'AG8A2624',
-    'AG8A2625', 'AG8A2626', 'AG8A2627', 'AG8A2628', 'AG8A2629', 'AG8A2632', 'AG8A2633',
-    'AG8A2634', 'AG8A2635', 'AG8A2637', 'AG8A2638', 'AG8A2639'
-  ];
-  
-  imageNames.forEach((name) => {
-    images.push(`/images/Highlights/${name}.jpg`);
-  });
-  
-  return images;
-};
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export const Gallery = () => {
-  const [images] = useState(generateImageList());
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const [visibleCount, setVisibleCount] = useState(24);
-  const [layout, setLayout] = useState('masonry'); // 'masonry' or 'grid'
+  const [layout, setLayout] = useState('masonry');
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async () => {
+    try {
+      const response = await axios.get(`${API}/gallery`);
+      const { db_images, fs_images } = response.data;
+      
+      // Combine database images and filesystem images
+      const allImages = [
+        ...db_images.map(img => ({
+          id: img.id,
+          path: img.path,
+          caption: img.caption,
+          category: img.category || 'Uploaded'
+        })),
+        ...fs_images.map(img => ({
+          id: img.id,
+          path: img.path,
+          caption: img.filename,
+          category: 'Highlights'
+        }))
+      ];
+      
+      setImages(allImages);
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+      // Fallback to filesystem images if API fails
+      const fallbackImages = generateFallbackImages();
+      setImages(fallbackImages);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fallback function if API fails
+  const generateFallbackImages = () => {
+    const imageNames = [
+      'AG8A2573', 'AG8A2576-2', 'AG8A2576', 'AG8A2578', 'AG8A2579-2', 'AG8A2580', 'AG8A2581',
+      'AG8A2584', 'AG8A2586', 'AG8A2588', 'AG8A2590', 'AG8A2591', 'AG8A2592', 'AG8A2593',
+      'AG8A2595', 'AG8A2597', 'AG8A2598', 'AG8A2599', 'AG8A2601', 'AG8A2602', 'AG8A2604',
+      'AG8A2605', 'AG8A2607', 'AG8A2610', 'AG8A2614', 'AG8A2615', 'AG8A2616', 'AG8A2617',
+      'AG8A2618', 'AG8A2619', 'AG8A2620', 'AG8A2621', 'AG8A2622', 'AG8A2623', 'AG8A2624',
+      'AG8A2625', 'AG8A2626', 'AG8A2627', 'AG8A2628', 'AG8A2629', 'AG8A2632', 'AG8A2633',
+      'AG8A2634', 'AG8A2635', 'AG8A2637', 'AG8A2638', 'AG8A2639'
+    ];
+    return imageNames.map((name, idx) => ({
+      id: `fallback-${idx}`,
+      path: `/images/Highlights/${name}.jpg`,
+      caption: name,
+      category: 'Highlights'
+    }));
+  };
 
   const loadMore = () => {
     setVisibleCount((prev) => Math.min(prev + 12, images.length));
@@ -61,6 +100,14 @@ export const Gallery = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImage]);
+
+  if (loading) {
+    return (
+      <div data-testid="gallery-page" className="pt-20 min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#C29B57] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div data-testid="gallery-page" className="pt-20">
@@ -111,25 +158,31 @@ export const Gallery = () => {
       {/* Gallery */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          {layout === 'masonry' ? (
-            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {images.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-[#4A5D54]">No images available yet.</p>
+            </div>
+          ) : layout === 'masonry' ? (
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
               {images.slice(0, visibleCount).map((img, idx) => (
                 <motion.div
-                  key={idx}
+                  key={img.id || idx}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: (idx % 12) * 0.05 }}
-                  viewport={{ once: true, margin: '-50px' }}
                   className="break-inside-avoid mb-4 cursor-pointer group"
                   onClick={() => openLightbox(idx)}
                 >
                   <div className="relative overflow-hidden rounded-sm">
                     <img
-                      src={img}
-                      alt={`Gallery image ${idx + 1}`}
+                      src={img.path}
+                      alt={img.caption || `Gallery image ${idx + 1}`}
                       data-testid={`gallery-image-${idx}`}
                       className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
                     />
                     <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300 pointer-events-none" />
                   </div>
@@ -140,21 +193,23 @@ export const Gallery = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {images.slice(0, visibleCount).map((img, idx) => (
                 <motion.div
-                  key={idx}
+                  key={img.id || idx}
                   initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: (idx % 12) * 0.05 }}
-                  viewport={{ once: true, margin: '-50px' }}
                   className="cursor-pointer group aspect-square"
                   onClick={() => openLightbox(idx)}
                 >
                   <div className="relative overflow-hidden rounded-sm h-full">
                     <img
-                      src={img}
-                      alt={`Gallery image ${idx + 1}`}
+                      src={img.path}
+                      alt={img.caption || `Gallery image ${idx + 1}`}
                       data-testid={`gallery-grid-image-${idx}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
                     />
                     <div className="absolute inset-0 bg-[#1C2522]/0 group-hover:bg-[#1C2522]/20 transition-colors duration-300 pointer-events-none" />
                   </div>
@@ -231,16 +286,23 @@ export const Gallery = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              src={images[selectedImage]}
-              alt={`Gallery image ${selectedImage + 1}`}
+              src={images[selectedImage]?.path}
+              alt={images[selectedImage]?.caption || `Gallery image ${selectedImage + 1}`}
               className="max-h-[85vh] max-w-[90vw] object-contain rounded-sm"
               onClick={(e) => e.stopPropagation()}
               data-testid="lightbox-image"
             />
 
-            {/* Counter */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[#F8F5F0]/70 text-sm">
-              {selectedImage + 1} / {images.length}
+            {/* Counter & Caption */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
+              <div className="text-[#F8F5F0]/70 text-sm">
+                {selectedImage + 1} / {images.length}
+              </div>
+              {images[selectedImage]?.caption && (
+                <div className="text-[#F8F5F0] text-sm mt-1">
+                  {images[selectedImage].caption}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

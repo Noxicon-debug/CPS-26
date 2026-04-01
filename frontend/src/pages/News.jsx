@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, ArrowRight, Clock, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Calendar, ArrowRight, Clock, User, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -19,7 +20,7 @@ const newsImages = [
 
 const sampleNews = [
   {
-    id: '1',
+    id: 'sample-1',
     title: 'New Executive Committee Elected for 2025',
     excerpt: 'The Catholic Professionals Society PNG has elected a new executive committee to lead the organization through 2025 and beyond.',
     content: 'Full article content here...',
@@ -31,7 +32,7 @@ const sampleNews = [
     image: newsImages[0],
   },
   {
-    id: '2',
+    id: 'sample-2',
     title: 'Successful Charity Drive Raises K50,000',
     excerpt: 'Our annual charity drive exceeded expectations, raising over K50,000 for local schools and hospitals.',
     content: 'Full article content here...',
@@ -43,7 +44,7 @@ const sampleNews = [
     image: newsImages[1],
   },
   {
-    id: '3',
+    id: 'sample-3',
     title: 'Partnership with Local Universities Announced',
     excerpt: 'We are excited to announce new partnerships with leading universities to support Catholic student professionals.',
     content: 'Full article content here...',
@@ -55,7 +56,7 @@ const sampleNews = [
     image: newsImages[2],
   },
   {
-    id: '4',
+    id: 'sample-4',
     title: 'Lenten Reflection Series Coming Soon',
     excerpt: 'Join us for a special Lenten reflection series designed for busy professionals seeking spiritual growth.',
     content: 'Full article content here...',
@@ -67,7 +68,7 @@ const sampleNews = [
     image: newsImages[3],
   },
   {
-    id: '5',
+    id: 'sample-5',
     title: 'Member Spotlight: Dr. Maria Santos',
     excerpt: 'Learn about Dr. Maria Santos and her journey integrating faith with her medical practice.',
     content: 'Full article content here...',
@@ -79,7 +80,7 @@ const sampleNews = [
     image: newsImages[4],
   },
   {
-    id: '6',
+    id: 'sample-6',
     title: 'Year in Review: 2024 Achievements',
     excerpt: 'A look back at our accomplishments, growth, and impact throughout 2024.',
     content: 'Full article content here...',
@@ -93,24 +94,38 @@ const sampleNews = [
 ];
 
 export const News = () => {
-  const [news, setNews] = useState(sampleNews);
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
 
   const categories = ['All', 'Announcements', 'Community', 'Partnerships', 'Spirituality', 'Member Stories'];
 
   useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const response = await axios.get(`${API}/news`);
-        if (response.data && response.data.length > 0) {
-          setNews(response.data);
-        }
-      } catch (error) {
-        console.log('Using sample news');
-      }
-    };
     fetchNews();
   }, []);
+
+  const fetchNews = async () => {
+    try {
+      const response = await axios.get(`${API}/news`);
+      if (response.data && response.data.length > 0) {
+        // Add default images to news without images
+        const newsWithImages = response.data.map((article, idx) => ({
+          ...article,
+          image: article.image || newsImages[idx % newsImages.length]
+        }));
+        setNews(newsWithImages);
+      } else {
+        setNews(sampleNews);
+      }
+    } catch (error) {
+      console.log('Using sample news');
+      setNews(sampleNews);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -121,12 +136,36 @@ export const News = () => {
     });
   };
 
+  const handleNewsletterSubscribe = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    setSubscribing(true);
+    try {
+      await axios.post(`${API}/newsletter`, { email: newsletterEmail });
+      toast.success('Successfully subscribed to newsletter!');
+      setNewsletterEmail('');
+    } catch (error) {
+      toast.error('Failed to subscribe. Please try again.');
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   const filteredNews = selectedCategory === 'All' 
     ? news 
     : news.filter((n) => n.category === selectedCategory);
 
   const featuredNews = news.find((n) => n.featured) || news[0];
   const otherNews = filteredNews.filter((n) => n.id !== featuredNews?.id);
+
+  if (loading) {
+    return (
+      <div data-testid="news-page" className="pt-20 min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#C29B57] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div data-testid="news-page" className="pt-20">
@@ -235,64 +274,73 @@ export const News = () => {
       {/* News Grid */}
       <section className="py-16 md:py-24 bg-[#F8F5F0]">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherNews.map((article, idx) => (
-              <motion.div
-                key={article.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card
-                  data-testid={`news-card-${idx}`}
-                  className="bg-[#F8F5F0] border border-[#1C2522]/10 rounded-sm overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+          {otherNews.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="w-12 h-12 text-[#C29B57] mx-auto mb-4" />
+              <p className="text-[#4A5D54]">No articles in this category yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {otherNews.map((article, idx) => (
+                <motion.div
+                  key={article.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  viewport={{ once: true }}
                 >
-                  <div className="relative h-48">
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-3 left-3 bg-[#F8F5F0] text-[#7A2E35] px-3 py-1 rounded-sm text-xs font-bold">
-                      {article.category}
+                  <Card
+                    data-testid={`news-card-${idx}`}
+                    className="bg-[#F8F5F0] border border-[#1C2522]/10 rounded-sm overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+                  >
+                    <div className="relative h-48">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-3 left-3 bg-[#F8F5F0] text-[#7A2E35] px-3 py-1 rounded-sm text-xs font-bold">
+                        {article.category}
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex items-center gap-3 text-[#4A5D54] text-sm mb-3">
-                      <span>{formatDate(article.date)}</span>
-                      <span className="text-[#1C2522]/20">|</span>
-                      <span>{article.readTime}</span>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-center gap-3 text-[#4A5D54] text-sm mb-3">
+                        <span>{formatDate(article.date)}</span>
+                        <span className="text-[#1C2522]/20">|</span>
+                        <span>{article.readTime}</span>
+                      </div>
+                      <h3 className="font-['Cormorant_Garamond'] text-xl font-semibold text-[#1C2522] mb-3 line-clamp-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-[#4A5D54] text-sm line-clamp-3 flex-1">
+                        {article.excerpt}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        className="mt-4 p-0 h-auto text-[#7A2E35] hover:text-[#1C2522] hover:bg-transparent justify-start"
+                      >
+                        Read More
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </Button>
                     </div>
-                    <h3 className="font-['Cormorant_Garamond'] text-xl font-semibold text-[#1C2522] mb-3 line-clamp-2">
-                      {article.title}
-                    </h3>
-                    <p className="text-[#4A5D54] text-sm line-clamp-3 flex-1">
-                      {article.excerpt}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      className="mt-4 p-0 h-auto text-[#7A2E35] hover:text-[#1C2522] hover:bg-transparent justify-start"
-                    >
-                      Read More
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
           {/* Pagination placeholder */}
-          <div className="text-center mt-12">
-            <Button
-              variant="outline"
-              data-testid="load-more-news"
-              className="border-[#1C2522]/20 text-[#1C2522] hover:bg-[#EAE5DC] rounded-sm px-8"
-            >
-              Load More Articles
-            </Button>
-          </div>
+          {otherNews.length > 0 && (
+            <div className="text-center mt-12">
+              <Button
+                variant="outline"
+                data-testid="load-more-news"
+                className="border-[#1C2522]/20 text-[#1C2522] hover:bg-[#EAE5DC] rounded-sm px-8"
+              >
+                Load More Articles
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -305,20 +353,24 @@ export const News = () => {
           <p className="text-[#F8F5F0]/80 mt-4 max-w-xl mx-auto">
             Get the latest news, event updates, and member stories delivered to your inbox.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 max-w-md mx-auto">
-            <input
+          <form onSubmit={handleNewsletterSubscribe} className="flex flex-col sm:flex-row gap-4 justify-center mt-8 max-w-md mx-auto">
+            <Input
               type="email"
               placeholder="Enter your email"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               data-testid="newsletter-email"
               className="flex-1 px-4 py-3 bg-[#F8F5F0] text-[#1C2522] rounded-sm outline-none focus:ring-2 focus:ring-[#C29B57]"
             />
             <Button
+              type="submit"
+              disabled={subscribing}
               data-testid="newsletter-subscribe"
               className="bg-[#1C2522] text-[#F8F5F0] hover:bg-[#2D3B36] px-6 rounded-sm"
             >
-              Subscribe
+              {subscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Subscribe'}
             </Button>
-          </div>
+          </form>
         </div>
       </section>
     </div>
