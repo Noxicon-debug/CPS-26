@@ -7,8 +7,11 @@ import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { cpsContact } from '../content/cpsContact';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = process.env.REACT_APP_BACKEND_URL
+  ? `${process.env.REACT_APP_BACKEND_URL}/api`
+  : null;
 
 export const Contact = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +34,9 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      if (!API) {
+        throw new Error('Contact form preview mode');
+      }
       await axios.post(`${API}/contact`, formData);
       setIsSubmitted(true);
       toast.success('Message sent successfully!');
@@ -42,7 +48,11 @@ export const Contact = () => {
         message: '',
       });
     } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+      if (!API) {
+        toast.info(`Preview mode: please email ${cpsContact.footer.email} or call ${cpsContact.footer.phone}.`);
+      } else {
+        toast.error('Failed to send message. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -52,22 +62,22 @@ export const Contact = () => {
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: ['Port Moresby', 'Papua New Guinea'],
+      details: cpsContact.addressLines.map((value) => ({ value })),
     },
     {
       icon: Mail,
       title: 'Email Us',
-      details: ['info@catholicprofessionalspng.org', 'membership@catholicprofessionalspng.org'],
+      details: cpsContact.emails,
     },
     {
       icon: Phone,
       title: 'Call Us',
-      details: ['+675 XXX XXXX', '+675 XXX YYYY'],
+      details: cpsContact.phones,
     },
     {
       icon: Clock,
       title: 'Office Hours',
-      details: ['Monday - Friday', '9:00 AM - 5:00 PM'],
+      details: cpsContact.officeHours.map((value) => ({ value })),
     },
   ];
 
@@ -89,7 +99,10 @@ export const Contact = () => {
               Contact Us
             </h1>
             <p className="text-lg text-[#4A5D54] mt-4 max-w-2xl mx-auto">
-              We'd love to hear from you. Reach out to learn more about our community or to join us.
+              Reach out to learn more about our community, membership, and upcoming programs across Papua New Guinea.
+            </p>
+            <p className="text-sm text-[#4A5D54] mt-3 max-w-2xl mx-auto">
+              {cpsContact.supportNote}
             </p>
           </motion.div>
         </div>
@@ -180,7 +193,7 @@ export const Contact = () => {
                         onChange={handleChange}
                         data-testid="contact-phone"
                         className="bg-transparent border-0 border-b border-[#1C2522]/20 rounded-none px-0 py-3 focus:border-[#C29B57] focus:ring-0 outline-none transition-colors"
-                        placeholder="+675 XXX XXXX"
+                        placeholder="e.g. +675 7123 4567"
                       />
                     </div>
                     <div className="space-y-2">
@@ -262,9 +275,20 @@ export const Contact = () => {
                         {info.title}
                       </h3>
                       {info.details.map((detail, i) => (
-                        <p key={i} className="text-[#4A5D54]">
-                          {detail}
-                        </p>
+                        detail.href ? (
+                          <a
+                            key={`${info.title}-${i}`}
+                            href={detail.href}
+                            className="block text-[#4A5D54] hover:text-[#C29B57] transition-colors"
+                          >
+                            {detail.label ? `${detail.label}: ` : ''}
+                            {detail.value}
+                          </a>
+                        ) : (
+                          <p key={`${info.title}-${i}`} className="text-[#4A5D54]">
+                            {detail.value}
+                          </p>
+                        )
                       ))}
                     </div>
                   </div>
@@ -276,7 +300,8 @@ export const Contact = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-12 h-12 text-[#C29B57] mx-auto mb-4" />
-                    <p className="text-[#4A5D54]">Port Moresby, Papua New Guinea</p>
+                    <p className="text-[#4A5D54]">{cpsContact.addressLines[0]}</p>
+                    <p className="text-[#4A5D54]">{cpsContact.addressLines[1]}</p>
                   </div>
                 </div>
               </div>

@@ -8,6 +8,7 @@ import { Card } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Save, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { cpsContact } from '../../content/cpsContact';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -35,9 +36,9 @@ export const PageSettingsManager = () => {
 
   const [footerSettings, setFooterSettings] = useState({
     tagline: 'Uniting Catholic professionals across Papua New Guinea to serve, connect, and grow together in faith and excellence.',
-    address: 'Port Moresby, Papua New Guinea',
-    email: 'info@catholicprofessionalspng.org',
-    phone: '+675 XXX XXXX',
+    address: cpsContact.footer.address,
+    email: cpsContact.footer.email,
+    phone: cpsContact.footer.phone,
     facebook: '',
     twitter: ''
   });

@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = process.env.REACT_APP_BACKEND_URL
+  ? `${process.env.REACT_APP_BACKEND_URL}/api`
+  : null;
 
 const AuthContext = createContext(null);
 
@@ -10,6 +12,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
+    if (!API) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.get(`${API}/auth/me`, {
         withCredentials: true
@@ -33,6 +41,9 @@ export const AuthProvider = ({ children }) => {
   }, [checkAuth]);
 
   const login = async (email, password) => {
+    if (!API) {
+      throw new Error('Backend URL is not configured');
+    }
     const response = await axios.post(`${API}/auth/login`, { email, password }, {
       withCredentials: true
     });
@@ -41,6 +52,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
+    if (!API) {
+      throw new Error('Backend URL is not configured');
+    }
     const response = await axios.post(`${API}/auth/register`, { name, email, password }, {
       withCredentials: true
     });
@@ -55,6 +69,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const processGoogleAuth = async (sessionId) => {
+    if (!API) {
+      throw new Error('Backend URL is not configured');
+    }
     const response = await axios.post(`${API}/auth/google/session`, { session_id: sessionId }, {
       withCredentials: true
     });
@@ -63,6 +80,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    if (!API) {
+      setUser(null);
+      return;
+    }
     try {
       await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
     } catch (error) {

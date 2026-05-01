@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Cross, Mail, MapPin, Phone, Facebook, Twitter } from 'lucide-react';
+import { Mail, MapPin, Phone, Facebook, Twitter } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
+import { cpsContact } from '../content/cpsContact';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,27 +10,19 @@ export const Footer = () => {
     <footer data-testid="footer" className="bg-[#1C2522] text-[#F8F5F0]">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-[#C29B57] rounded-sm flex items-center justify-center">
-                <Cross className="w-5 h-5 text-[#1C2522]" />
-              </div>
-              <div>
-                <span className="font-['Cormorant_Garamond'] text-xl font-semibold">
-                  Catholic Professionals
-                </span>
-                <span className="block text-xs uppercase tracking-[0.2em] text-[#C29B57]">
-                  PNG
-                </span>
-              </div>
-            </div>
+            <BrandLogo
+              inverted
+              size="sm"
+              title="Catholic Professionals Society"
+              subtitle="Papua New Guinea"
+              className="mb-6"
+            />
             <p className="text-[#F8F5F0]/70 text-sm leading-relaxed">
-              Uniting Catholic professionals across Papua New Guinea to serve, connect, and grow together in faith and excellence.
+              Uniting Catholic professionals across Papua New Guinea to witness faith, serve society, and grow together in excellence.
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="font-['Cormorant_Garamond'] text-lg font-semibold mb-6">
               Quick Links
@@ -47,7 +41,6 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h4 className="font-['Cormorant_Garamond'] text-lg font-semibold mb-6">
               Contact Us
@@ -56,28 +49,30 @@ export const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[#C29B57] mt-0.5 flex-shrink-0" />
                 <span className="text-[#F8F5F0]/70 text-sm">
-                  Port Moresby, Papua New Guinea
+                  {cpsContact.footer.address}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#C29B57] flex-shrink-0" />
                 <a
-                  href="mailto:info@catholicprofessionalspng.org"
+                  href={`mailto:${cpsContact.footer.email}`}
                   className="text-[#F8F5F0]/70 hover:text-[#C29B57] transition-colors text-sm"
                 >
-                  info@catholicprofessionalspng.org
+                  {cpsContact.footer.email}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-[#C29B57] flex-shrink-0" />
-                <span className="text-[#F8F5F0]/70 text-sm">
-                  +675 XXX XXXX
-                </span>
+                <a
+                  href={cpsContact.phones[0].href}
+                  className="text-[#F8F5F0]/70 hover:text-[#C29B57] transition-colors text-sm"
+                >
+                  {cpsContact.footer.phone}
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Social & Newsletter */}
           <div>
             <h4 className="font-['Cormorant_Garamond'] text-lg font-semibold mb-6">
               Follow Us
@@ -99,12 +94,11 @@ export const Footer = () => {
               </a>
             </div>
             <p className="text-[#F8F5F0]/50 text-xs">
-              Stay connected with our community and receive updates on events and news.
+              Stay connected with our community and receive updates on events, formation, and Society news.
             </p>
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-[#F8F5F0]/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#F8F5F0]/50 text-sm">
             &copy; {currentYear} Catholic Professionals Society PNG. All rights reserved.

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Cross, User } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from './BrandLogo';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,7 +26,7 @@ export const Navbar = () => {
     { name: 'Gallery', path: '/gallery' },
     { name: 'Events', path: '/events' },
     { name: 'News', path: '/news' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Contact', path: '/contact' }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -41,26 +42,16 @@ export const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link
-            to="/"
-            data-testid="nav-logo"
-            className="flex items-center gap-3 group"
-          >
-            <div className="w-10 h-10 bg-[#7A2E35] rounded-sm flex items-center justify-center">
-              <Cross className="w-5 h-5 text-[#F8F5F0]" />
-            </div>
-            <div className="hidden sm:block">
-              <span className="font-['Cormorant_Garamond'] text-xl font-semibold text-[#1C2522] tracking-tight">
-                Catholic Professionals
-              </span>
-              <span className="block text-xs uppercase tracking-[0.2em] text-[#C29B57] font-bold">
-                Papua New Guinea
-              </span>
-            </div>
+          <Link to="/" data-testid="nav-logo" className="flex items-center gap-3 group">
+            <BrandLogo
+              size="sm"
+              title="Catholic Professionals"
+              subtitle="Papua New Guinea"
+              className="gap-3"
+              logoClassName="rounded-sm"
+            />
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -84,7 +75,6 @@ export const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <Button
@@ -117,7 +107,6 @@ export const Navbar = () => {
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             data-testid="mobile-menu-button"
             className="lg:hidden p-2"
@@ -132,7 +121,6 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
